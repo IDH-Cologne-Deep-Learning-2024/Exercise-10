@@ -18,7 +18,6 @@ df = df.head(8000)
 X_word = df["Word"]
 y_pos = df["POS"]
 y_tag = df["Tag"]
-
 y_tag, tag_cl = pd.factorize(y_tag)
 y_pos, pos_cl = pd.factorize(y_pos)
 
@@ -54,7 +53,7 @@ LSTM_POS = Sequential([
     Dense(len(pos_cl), activation="softmax", name="tag_output")
 ])
 
-LSTM_tag = Sequential([
+LSTM_TAG = Sequential([
     Input(shape=(MAX_LENGTH,)),
     Embedding(input_dim=vocab_size, output_dim=32, input_length=MAX_LENGTH),
     LSTM(64, activation="tanh", recurrent_activation="sigmoid",
@@ -73,16 +72,16 @@ LSTM_POS.compile(optimizer=Adam(learning_rate=0.001),
                   loss="sparse_categorical_crossentropy",
                   metrics=["accuracy"])
 
-LSTM_tag.compile(optimizer=Adam(learning_rate=0.001), 
+LSTM_TAG.compile(optimizer=Adam(learning_rate=0.001), 
                   loss='sparse_categorical_crossentropy',
                   metrics=['accuracy'])
 
 LSTM_POS.fit(tok_X_train, y_pos_train, epochs=10, batch_size=64, validation_split=0.1, verbose=1)
-LSTM_tag.fit(tok_X_train, y_tag_train, epochs=10, batch_size=64, validation_split=0.1, verbose=1)
+LSTM_TAG.fit(tok_X_train, y_tag_train, epochs=10, batch_size=64, validation_split=0.1, verbose=1)
 
 y_pred_pos = LSTM_POS.predict(tok_X_test)
 y_pred_pos = np.argmax(y_pred_pos, axis=1)
-y_pred_tag = LSTM_tag.predict(tok_X_test)
+y_pred_tag = LSTM_TAG.predict(tok_X_test)
 y_pred_tag = np.argmax(y_pred_tag, axis=1)
 print("LSTM Model:")
 print(classification_report(y_pos_test, y_pred_pos))
